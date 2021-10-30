@@ -17,15 +17,13 @@ You find the mouse control panel in the menu `Tools > Utilities > Mouse controls
 
 ### Zoom
 
-Click the zoom button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Zoom.png). 
-Afterwards, you can click in the napari canvas and move the mouse up and down to zoom in and out.
+After clicking the Zoom button, you can click in the napari canvas and move the mouse up and down to zoom in and out.
 
 ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/docs/zoom.gif)
 
 ### Slicing
 
-Click the Slicing button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Slicing.png).
-Afterwards, you can control the currently displayed slice by moving the mouse.
+After clicking the Slicing button, you can control the currently displayed slice by moving the mouse.
 By moving the mouse up and down, you control the currently selected Z-plane.
 By moving the mouse left and right, you control the currently seleted time point.
 
@@ -33,8 +31,7 @@ By moving the mouse left and right, you control the currently seleted time point
 
 ### Windowing
 
-Click the Windowing button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Slicing.png).
-Afterwards, you can modify the brightness and contrast by moving the mouse. 
+After clicking the Windowing button, you can modify the brightness and contrast by moving the mouse. 
 By moving the mouse up and down, you control window width of the range of displayed grey values (max - min).
 By moving the mouse left and right, you control the center of the grey value window. 
 
