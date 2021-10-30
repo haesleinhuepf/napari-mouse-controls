@@ -1,15 +1,18 @@
 import warnings
 
 from napari_plugin_engine import napari_hook_implementation
-from qtpy.QtWidgets import QWidget, QHBoxLayout, QPushButton
+from qtpy.QtWidgets import QSpacerItem, QSizePolicy
+from qtpy.QtWidgets import QWidget, QHBoxLayout, QVBoxLayout, QPushButton
 from magicgui import magic_factory
 import napari
 from qtpy.QtCore import QSize
 from qtpy.QtGui import QIcon
 from pathlib import Path
+from napari_tools_menu import register_dock_widget
 
 ICON_ROOT = Path(__file__).parent / "icons"
 
+@register_dock_widget(menu="Utilities > Mouse controls")
 class MouseControls(QWidget):
     """
     The mouse control widget allows to configure what the mouse is doing,
@@ -27,28 +30,37 @@ class MouseControls(QWidget):
         self.mode = None
 
         # GUI
-        self.setLayout(QHBoxLayout())
+        
+        self.setLayout(QVBoxLayout())
+        
+        widget = QWidget()
+        widget.setLayout(QHBoxLayout())
 
         btn = QPushButton("Zoom")
         self._init_button(btn)
         btn.clicked.connect(self._zoom)
-        self.layout().addWidget(btn)
-        self.layout().addWidget(btn)
+        widget.layout().addWidget(btn)
 
         btn = QPushButton("Slicing")
         self._init_button(btn)
         btn.clicked.connect(self._slicing)
-        self.layout().addWidget(btn)
+        widget.layout().addWidget(btn)
 
         btn = QPushButton("Windowing")
         self._init_button(btn)
         btn.clicked.connect(self._windowing)
-        self.layout().addWidget(btn)
+        widget.layout().addWidget(btn)
 
         btn = QPushButton("Default")
         self._init_button(btn)
         btn.clicked.connect(self._deactivate)
-        self.layout().addWidget(btn)
+        widget.layout().addWidget(btn)
+        
+        self.layout().addWidget(widget)
+        
+        verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.layout().addItem(verticalSpacer)
+
 
     def _init_button(self, btn):
         btn.setIcon(QIcon(self._get_icon(btn.text())))

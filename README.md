@@ -13,8 +13,37 @@ Control zoom, slicing and contrast windowing with mouse and touch screen
 
 ## Usage
 
-Zoom: Click the ![]()
+You find the mouse control panel in the menu `Tools > Utilities > Mouse controls`
 
+### Zoom
+
+Click the zoom button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Zoom.png). 
+Afterwards, you can click in the napari canvas and move the mouse up and down to zoom in and out.
+
+![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/docs/zoom.gif)
+
+### Slicing
+
+Click the Slicing button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Slicing.png).
+Afterwards, you can control the currently displayed slice by moving the mouse.
+By moving the mouse up and down, you control the currently selected Z-plane.
+By moving the mouse left and right, you control the currently seleted time point.
+
+![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/docs/slicing.gif)
+
+### Windowing
+
+Click the Windowing button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Slicing.png).
+Afterwards, you can modify the brightness and contrast by moving the mouse. 
+By moving the mouse up and down, you control window width of the range of displayed grey values (max - min).
+By moving the mouse left and right, you control the center of the grey value window. 
+
+![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/docs/windowing.gif)
+
+### Normal / default mode
+
+Click the Default button ![](https://github.com/haesleinhuepf/napari-mouse-controls/raw/main/src/napari_mouse_controls/icons/Default.png)
+to return to napari's normal mode.
 
 
 This [napari] plugin was generated with [Cookiecutter] using with [@napari]'s [cookiecutter-napari-plugin] template.
