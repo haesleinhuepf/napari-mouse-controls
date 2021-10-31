@@ -134,14 +134,9 @@ class MouseControls(QWidget):
         elif self.mode == "Windowing":
             window_width = self.start_contrast_limits_maximum - self.start_contrast_limits_minimum
             window_position = (self.start_contrast_limits_maximum + self.start_contrast_limits_minimum) / 2
-            if relative_y < 1:
-                window_width = window_width * (1 - relative_y)
-            else:
-                window_width = window_width * (1 + relative_y)
-            if relative_x < 1:
-                window_position = window_position * (1 - relative_x)
-            else:
-                window_position = window_position * (1 + relative_x)
+
+            window_width = window_width * (1 + relative_x)
+            window_position = window_position * (1 - relative_y)
 
             new_minimum = window_position - window_width / 2
             new_maximum = window_position + window_width / 2
