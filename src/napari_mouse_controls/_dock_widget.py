@@ -61,7 +61,11 @@ class MouseControls(QWidget):
         verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         self.layout().addItem(verticalSpacer)
 
-        self.setMaximumHeight(100)
+        self.setMaximumHeight(80)
+
+        self.layout().setSpacing(3)
+        self.layout().setContentsMargins(0, 0, 0, 0)
+
 
 
     def _init_button(self, btn):
