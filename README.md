@@ -52,6 +52,8 @@ You can install `napari-mouse-controls` via [pip]:
 
     pip install napari-mouse-controls
 
+Note: This plugin is not compatible with napari 0.6.0 and later.
+
 ## Contributing
 
 Contributions are very welcome. Tests can be run with [tox], please ensure
