@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: [3.7, 3.8, 3.9]
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v2
@@ -35,12 +35,7 @@ jobs:
 
       # these libraries, along with pytest-xvfb (added in the `deps` in tox.ini),
       # enable testing on Qt on linux
-      - name: Install Linux libraries
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get install -y libdbus-1-3 libxkbcommon-x11-0 libxcb-icccm4 \
-            libxcb-image0 libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 \
-            libxcb-xinerama0 libxcb-xinput0 libxcb-xfixes0
+      - uses: tlambert03/setup-qt-libs@v1
 
       # strategy borrowed from vispy for installing opengl libs on windows
       - name: Install Windows OpenGL
@@ -64,8 +59,53 @@ jobs:
         env:
           PLATFORM: ${{ matrix.platform }}
 
-      - name: Coverage
-        uses: codecov/codecov-action@v1
+      - name: Upload coverage data
+        uses: actions/upload-artifact@v4.4.0
+        with:
+          name: coverage reports ${{ matrix.platform }} py ${{ matrix.python_version }}
+          include-hidden-files: true
+          path: |
+            ./.coverage.*
+
+  upload_coverage:
+    needs: [test]
+    name: Upload coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+          cache-dependency-path: pyproject.toml
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install codecov
+
+      - name: Download coverage data
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage reports*
+          path: coverage
+          merge-multiple: true
+
+      - name: combine coverage data
+        run: |
+          python -Im coverage combine coverage
+          python -Im coverage xml -o coverage.xml
+
+          # Report and write to summary.
+          python -Im coverage report --format=markdown --skip-empty --skip-covered >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage data
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: true
+          token: ${{ secrets.codecov_token }}
+          version: v0.6.0
 
   deploy:
     # this will run when you have tagged a commit, starting with "v*"

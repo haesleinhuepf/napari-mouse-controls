@@ -28,6 +28,8 @@ class MouseControls(QWidget):
         self.active = False
         self.mouse_down = False
         self.mode = None
+        self.start_x = None
+        self.start_y = None
 
         # GUI
         
@@ -90,6 +92,9 @@ class MouseControls(QWidget):
         relative_y = delta_y / self.viewer.window.qt_viewer.height()
 
         if self.mode == "Zoom":
+            if y == 0:
+                # workaround for strange events during zoom
+                return
             self.viewer.camera.zoom = self._start_zoom * (1 + relative_y)
             print("zoom", relative_y)
         elif self.mode == "Slicing":
@@ -164,65 +169,54 @@ class MouseControls(QWidget):
     def _activate(self):
         if self.active:
             return
+        
+        self.viewer.mouse_drag_callbacks.append(self.mouse_drag_callback)
 
-        self.copy_on_mouse_press = self.viewer.window.qt_viewer.on_mouse_press
-        self.copy_on_mouse_move = self.viewer.window.qt_viewer.on_mouse_move
-        self.copy_on_mouse_release = self.viewer.window.qt_viewer.on_mouse_release
-
-        def our_mouse_press(event=None):
-
-            if self.mode == "Windowing":
-                if len(self.viewer.layers.selection) == 0:
-                    warnings.warn("No layer selected")
-                    return
-                if len(self.viewer.layers.selection) == 0:
-                    warnings.warn("Multiple layers selected")
-                    return
-                selected_layers = [layer for layer in self.viewer.layers.selection if isinstance(layer, napari.layers.Image)]
-                if not isinstance(selected_layers[0], napari.layers.Image):
-                    warnings.warn("No image layer selected")
-                    return
-
-                self.current_layer = selected_layers[0]
-                self.start_contrast_limits_minimum = self.current_layer.contrast_limits[0]
-                self.start_contrast_limits_maximum = self.current_layer.contrast_limits[1]
-
-            print("mouse press", event.native.x(), event.native.y(), event.native.button())
-            self.mouse_down = True
-            self.start_x = event.native.x()
-            self.start_y = event.native.y()
-
-            self.current_step = list(self.viewer.dims.current_step)
-            print("CURRENT step", self.current_step)
-
-            self._start_zoom = self.viewer.camera.zoom
-
-        def our_mouse_move(event=None):
-            if not self.mouse_down:
-                return
-            print("mouse move", event.native.x(), event.native.y(), event.native.button())
-            self._handle_move(event.native.x(), event.native.y())
-
-        def our_mouse_release(event=None):
-            if not self.mouse_down:
-                return
-            print("mouse release", event.native.x(), event.native.y(), event.native.button())
-            self._handle_move(event.native.x(), event.native.y())
-            self.mouse_down = False
-
-        self.viewer.window.qt_viewer.on_mouse_press = our_mouse_press
-        self.viewer.window.qt_viewer.on_mouse_move = our_mouse_move
-        self.viewer.window.qt_viewer.on_mouse_release = our_mouse_release
         self.viewer.camera.interactive=False
         self.active = True
+
+    def mouse_move_callback(self, obj, event):
+        self.start_x = None
+        self.start_y = None
+        self.mouse_down = False
+
+    def mouse_drag_callback(self, obj, event):
+
+        if self.mode == "Windowing":
+            if len(self.viewer.layers.selection) == 0:
+                warnings.warn("No layer selected")
+                return
+            if len(self.viewer.layers.selection) > 1:
+                warnings.warn("Multiple layers selected")
+                return
+            selected_layers = [layer for layer in self.viewer.layers.selection if isinstance(layer, napari.layers.Image)]
+            if not selected_layers:
+                warnings.warn("No image layer selected")
+                return
+
+            self.current_layer = selected_layers[0]
+            self.start_contrast_limits_minimum = self.current_layer.contrast_limits[0]
+            self.start_contrast_limits_maximum = self.current_layer.contrast_limits[1]
+
+        self.start_x = event.native.x()
+        self.start_y = event.native.y()
+        self.mouse_down = True
+        self._start_zoom = self.viewer.camera.zoom
+        self.current_step = list(self.viewer.dims.current_step)
+        event.handled = True
+        yield
+        while event.type == 'mouse_move':
+            event.handled = True
+            self._handle_move(event.native.x(), event.native.y())
+            yield
+        event.handled = True
+        self.mouse_down = False
 
     def _deactivate(self):
         if not self.active:
             return
+        self.viewer.mouse_drag_callbacks.remove(self.mouse_drag_callback)
 
-        self.viewer.window.qt_viewer.on_mouse_press = self.copy_on_mouse_press
-        self.viewer.window.qt_viewer.on_mouse_move = self.copy_on_mouse_move
-        self.viewer.window.qt_viewer.on_mouse_release = self.copy_on_mouse_release
         self.viewer.camera.interactive=True
         self.active = False
 
